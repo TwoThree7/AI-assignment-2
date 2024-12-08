@@ -1,0 +1,55 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier, export_text
+from sklearn.metrics import accuracy_score
+from sklearn.tree import plot_tree
+import numpy as np
+
+column_names = [ "StudentID", "Age", "Gender", "Ethnicity", "ParentalEducation","StudyTimeWeekly", "Absences", "Tutoring", "ParentalSupport", "Extracurricular", "Sports", "Music", "Volunteering", "GPA", "GradeClass"]
+#Assign column names
+df = pd.read_csv('dataset.csv', names=column_names, header=None)
+#Filtering out columns which will not enhance the predictions
+df=df.drop(columns=["StudentID"])
+df=df.drop(columns=["GPA"])
+#Features
+X = df.drop(columns=["GradeClass"])
+#Target Variable
+y = df["GradeClass"]
+#Split the data into a training set and a test set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+#Linear Regression
+model = LinearRegression()
+model.fit(X_train, y_train)
+Y_pred = model.predict(X_test)
+
+#Linear Regression Models Performance
+print("Coefficients: ", model.coef_)
+print("Intercept: ", model.intercept_)
+print("Mean squared error: ", mean_squared_error(y_test, Y_pred))
+print("R2 score: ", r2_score(y_test, Y_pred))
+
+#Visualise Results
+y_testArray = np.array(y_test)
+sns.scatterplot(x=y_testArray, y=Y_pred)
+plt.show()
+
+#Decision Tree
+modelDT = DecisionTreeClassifier()
+modelDT.fit(X_train, y_train)
+Y_predDT = modelDT.predict(X_test)
+#Decision Tree Models Performance
+print("Mean squared error: ", mean_squared_error(y_test, Y_pred))
+print("R2 score: ", r2_score(y_test, Y_pred))
+#Visualise results
+plt.scatter(y_test, Y_predDT, alpha=0.7, color='green')
+plt.xlabel("Actual GradeClass")
+plt.ylabel("Predicted GradeClass")
+plt.title("Actual vs Predicted GradeClass (Decision Tree)")
+plt.grid(True)
+plt.show()
