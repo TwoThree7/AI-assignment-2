@@ -1,0 +1,63 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier, export_text
+from sklearn.metrics import accuracy_score
+from sklearn.tree import plot_tree
+
+column_names = [ "StudentID", "Age", "Gender", "Ethnicity", "ParentalEducation","StudyTimeWeekly", "Absences", "Tutoring", "ParentalSupport", "Extracurricular", "Sports", "Music", "Volunteering", "GPA", "GradeClass"]
+#Assign column names
+df = pd.read_csv('dataset.csv', names=column_names, header=None)
+#data pre-processing steps
+#Check if there is any missing values within the dataset
+print("Missing values:\n", df.isnull().sum())
+#check if there are any outliers
+#sns.boxplot(data=df, x='GradeClass', y='StudyTimeWeekly')
+#plt.show()
+
+X = df["GradeClass"]
+y = df['GradeClass']
+# Standardize the features using StandardScaler
+scaler = StandardScaler()
+# Fit the scaler to the data
+scaler.fit(X)
+# Transform the data
+X_scaled = scaler.transform(X)
+
+#Split the data between test and train
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
+#print("Train set:\n", train_set)
+#print("Test set:\n", test_set)
+
+
+#Linear Regression Model
+model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+MSE = mean_squared_error(y_test, y_pred)
+print("Mean Squared Error",MSE)
+r2 = r2_score(y_test, y_pred)
+print("R^2 Score",r2)
+X = df[["StudyTimeWeekly"]]
+print("X shape:", X.shape)
+print("y shape:", y_pred.shape)
+#plt.scatter(y_test, X_test, color="blue", label="Actual Data")
+#plt.plot(X_test, y_test, color="red", label="Regression Line")
+#plt.xlabel("Study Time Weekly")
+#plt.ylabel("Grade class")
+#plt.legend()
+#plt.show()
+
+#Decision tree
+modelDT = DecisionTreeClassifier(criterion='gini', max_depth=3, random_state=42)
+modelDT.fit(X_train, y_train)
+y_predDT = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_predDT)
+print("Accuracy:",accuracy)
+#plt.figure(figsize=(10, 6))
+#plot_tree(model, feature_names=X.columns, class_names=['Class 0', 'Class 1'], filled=True)
+#plt.show()
